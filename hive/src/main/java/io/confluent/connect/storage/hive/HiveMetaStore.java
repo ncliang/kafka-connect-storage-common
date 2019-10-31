@@ -34,6 +34,7 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,7 +42,7 @@ import java.util.List;
 
 import io.confluent.connect.storage.errors.HiveMetaStoreException;
 
-public class HiveMetaStore {
+public class HiveMetaStore implements Closeable {
 
   private static final Logger log = LoggerFactory.getLogger(HiveMetaStore.class);
   protected final IMetaStoreClient client;
@@ -79,6 +80,11 @@ public class HiveMetaStore {
     } catch (IOException | MetaException e) {
       throw new HiveMetaStoreException(e);
     }
+  }
+
+  @Override
+  public void close() throws IOException {
+    client.close();
   }
 
   private interface ClientAction<R> {

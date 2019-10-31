@@ -20,13 +20,16 @@ import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.connect.data.Schema;
 
+import java.io.Closeable;
+import java.io.IOException;
+
 import io.confluent.connect.storage.common.StorageCommonConfig;
 import io.confluent.connect.storage.partitioner.Partitioner;
 
 /**
  * Utility class for integration with Hive.
  */
-public abstract class HiveUtil {
+public abstract class HiveUtil implements Closeable {
 
   protected String url;
   protected final HiveMetaStore hiveMetaStore;
@@ -49,5 +52,12 @@ public abstract class HiveUtil {
 
   public String hiveDirectoryName(String url, String topicsDir, String topic) {
     return url + delim + topicsDir + delim + topic + delim;
+  }
+
+  @Override
+  public void close() throws IOException {
+    if (hiveMetaStore != null) {
+      hiveMetaStore.close();
+    }
   }
 }
